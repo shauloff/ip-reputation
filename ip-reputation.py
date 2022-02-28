@@ -1,5 +1,4 @@
 from typing import Callable
-
 import requests
 import re
 import os
@@ -40,6 +39,7 @@ def get_data_from_vt(ip: str, add_info: bool) -> int:
         single_score = ((scanners_malicious+votes_malicious) + scanners_suspicious*0.5) / (scanners_harmless+scanners_malicious+scanners_suspicious+votes_harmless+votes_malicious)
         single_score = round(single_score*10)
 
+        # Print additional information for --verbose
         if add_info:
             prPurple("VirusTotal Details:")
             print(f"scanners_harmless: {scanners_harmless}")
@@ -47,7 +47,7 @@ def get_data_from_vt(ip: str, add_info: bool) -> int:
             print(f"scanners_suspicious: {scanners_suspicious}")
             print(f"votes_harmless: {votes_harmless}")
             print(f"votes_malicious: {votes_malicious}")
-            print(f"Total: {(scanners_harmless+scanners_malicious+scanners_suspicious+votes_harmless+votes_malicious)}")
+            print(f"Total sources: {(scanners_harmless+scanners_malicious+scanners_suspicious+votes_harmless+votes_malicious)}")
             prLightPurple(f"VirusTotal single score: {single_score}")
         return single_score
     else:
@@ -76,10 +76,11 @@ def get_data_from_neutrino(ip: str, add_info: bool) -> int:
         # Calculate normalized score - number of malicious divided by total
         single_score = round((listed / total_lists)*10)
 
+        # Print additional information for --verbose
         if add_info:
             prPurple("Neutrino Details:")
-            print(f"listed: {listed}")
-            print(f"total_lists: {total_lists}")
+            print(f"Listed in blacklists: {listed}")
+            print(f"Total sources: {total_lists}")
             prLightPurple(f"Neutrino single score: {single_score}")
         return single_score
     else:
@@ -119,6 +120,7 @@ if __name__ == '__main__':
                     normalized_score = normalize_score(ip, funcs_list=[get_data_from_vt, get_data_from_neutrino], add_info=args.verbose)
                     print(f"Normalized score: {normalized_score}")
 
+                    # Explain the IP score
                     if normalized_score <= 4:
                         prGreen(f"IP {ip} is clean.")
                     elif normalized_score <= 7:
